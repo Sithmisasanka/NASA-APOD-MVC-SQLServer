@@ -12,21 +12,78 @@
 
 <div asp-validation-summary="All" class="text-danger" style="margin-bottom:1rem;"></div>
 
-<form method="post" asp-controller="Apod" asp-action="Import">
+<div id="uiError" style="display:none; padding:10px; margin-bottom:1rem; background:#ff444433; border:1px solid #ff4444; color:#ffbaba; border-radius:4px;"></div>
+
+<form id="importForm" method="post" asp-controller="Apod" asp-action="Import">
     <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end;">
         <div class="form-group">
             <label for="startDate">Start Date</label>
-            <input type="date" id="startDate" name="startDate" required />
+            <input type="date" id="startDate" name="startDate" max="@DateTime.Today.ToString("yyyy-MM-dd")" required />
         </div>
         <div class="form-group">
             <label for="endDate">End Date</label>
-            <input type="date" id="endDate" name="endDate" required />
+            <input type="date" id="endDate" name="endDate" max="@DateTime.Today.ToString("yyyy-MM-dd")" required />
         </div>
         <div class="form-group">
-            <button type="submit" class="btn">Fetch &amp; Save</button>
+            <button type="submit" id="submitBtn" class="btn">Fetch &amp; Save</button>
         </div>
     </div>
 </form>
+
+<script>
+document.getElementById('importForm').addEventListener('submit', function(e) {
+    const errorDiv = document.getElementById('uiError');
+    const startStr = document.getElementById('startDate').value;
+    const endStr = document.getElementById('endDate').value;
+    const btn = document.getElementById('submitBtn');
+
+    errorDiv.style.display = 'none';
+    errorDiv.innerText = '';
+
+    if (!startStr || !endStr) {
+        e.preventDefault();
+        errorDiv.innerText = 'Start Date and End Date are required.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    start.setHours(0,0,0,0);
+    end.setHours(0,0,0,0);
+    
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    if (start > today || end > today) {
+        e.preventDefault();
+        errorDiv.innerText = 'Future dates are not allowed.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    if (start > end) {
+        e.preventDefault();
+        errorDiv.innerText = 'Start Date must be <= End Date.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diffDays > 30) {
+        e.preventDefault();
+        errorDiv.innerText = 'Maximum allowed range is 30 days.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    // Pass validation
+    btn.disabled = true;
+    btn.innerText = 'Fetching... Please wait';
+});
+</script>
 
 @if (ViewBag.Inserted != null)
 {
