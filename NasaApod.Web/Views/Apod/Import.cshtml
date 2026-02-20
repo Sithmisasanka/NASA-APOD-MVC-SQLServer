@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Import APOD Data";
+}
+
+<h1>Import APOD Data</h1>
+<p style="color:#8892b0; margin-bottom:1.5rem;">Select a date range to fetch from NASA's Astronomy Picture of the Day API.</p>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert-success">@ViewBag.Message</div>
+}
+
+<div asp-validation-summary="All" class="text-danger" style="margin-bottom:1rem;"></div>
+
+<form method="post" asp-controller="Apod" asp-action="Import">
+    <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end;">
+        <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" name="startDate" required />
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" name="endDate" required />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn">Fetch &amp; Save</button>
+        </div>
+    </div>
+</form>
+
+@if (ViewBag.Inserted != null)
+{
+    <div style="margin-top:1.5rem; padding:16px; background:#13162b; border-radius:8px; border:1px solid #2a2d45;">
+        <p><strong style="color:#64ffda;">Inserted:</strong> @ViewBag.Inserted</p>
+        <p><strong style="color:#ffb86c;">Skipped:</strong> @ViewBag.Skipped</p>
+    </div>
+}

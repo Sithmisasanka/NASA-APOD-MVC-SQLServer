@@ -1,0 +1,28 @@
+@model List<ApodItem>
+@{
+    ViewData["Title"] = "Gallery";
+}
+
+<h1>&#127756; Astronomy Picture of the Day</h1>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="empty">
+        <p>No images saved yet. <a asp-controller="Apod" asp-action="Import">Import a date range.</a></p>
+    </div>
+}
+else
+{
+    <div class="grid">
+        @foreach (var item in Model)
+        {
+            <div class="card">
+                <img src="@item.Url" alt="@item.Title" loading="lazy" />
+                <div class="card-body">
+                    <h3>@item.Title</h3>
+                    <small>@item.ApodDate.ToString("yyyy-MM-dd")</small>
+                </div>
+            </div>
+        }
+    </div>
+}
